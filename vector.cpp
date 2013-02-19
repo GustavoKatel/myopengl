@@ -28,14 +28,15 @@ float Vector::magnitude()
 {
 	float s = pow(get(0),2) +
       		pow(get(1),2) +
-		pow(get(2),2) +
-		pow(get(3),2);
+		pow(get(2),2);
 	float n = sqrt( s  );
 	return n;
 }
 void Vector::normalize()
 {
 	float n =magnitude();
+	if(!n)
+		return;
 	put(0, get(0)/n);
 	put(1, get(1)/n);
 	put(2, get(2)/n);

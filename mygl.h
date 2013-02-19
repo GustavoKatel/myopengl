@@ -43,13 +43,20 @@ void mygl_look_at(Vector *pos, Vector *dir, Vector *up)
 	temp.normalize();
 	Vector zc = -(temp);
 	//
+	std::cout<<"------ zc ---------"<<std::endl;
+	zc.print();
+	//
 	temp = (*up)*zc;
 	temp.normalize();
 	Vector xc = temp;
+	std::cout<<"------ xc ---------"<<std::endl;
+	xc.print();
 	//
 	temp =  zc * xc; 
 	temp.normalize();
 	Vector yc = temp;
+	std::cout<<"------ yc ---------"<<std::endl;
+	yc.print();
 
 	Matrix bT;
 	bT.load_identity();
