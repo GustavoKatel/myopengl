@@ -9,9 +9,10 @@
 
 /* ------------------- PIPELINE MATRIX ----------------------*/
 Matrix *_window;
+Matrix *_canonical;
 Matrix *_projection;
-Matrix *_model;
 Matrix *_view;
+Matrix *_model;
 
 void initMatrices()
 {
@@ -27,14 +28,17 @@ void initMatrices()
 	mygl_scale(_window,1.0,-1.0,1.0);
 	//
 	//
-	_projection = new Matrix();
-	_projection->load_identity();
-	//
 	_model = new Matrix();
 	_model->load_identity();
 	//
 	_view = new Matrix();
 	_view->load_identity();
+	//
+	_projection = new Matrix();
+	_projection->load_identity();
+	//
+	_canonical = new Matrix();
+	_canonical->load_identity();
 }
 
 void mygl_look_at(Vector *pos, Vector *dir, Vector *up)
@@ -43,20 +47,14 @@ void mygl_look_at(Vector *pos, Vector *dir, Vector *up)
 	temp.normalize();
 	Vector zc = -(temp);
 	//
-	std::cout<<"------ zc ---------"<<std::endl;
-	zc.print();
 	//
 	temp = (*up)*zc;
 	temp.normalize();
 	Vector xc = temp;
-	std::cout<<"------ xc ---------"<<std::endl;
-	xc.print();
 	//
 	temp =  zc * xc; 
 	temp.normalize();
 	Vector yc = temp;
-	std::cout<<"------ yc ---------"<<std::endl;
-	yc.print();
 
 	Matrix bT;
 	bT.load_identity();
@@ -82,6 +80,24 @@ void mygl_look_at(Vector *pos, Vector *dir, Vector *up)
 	*_view = (*_view)*t;
 }
 
+void mygl_perspective(float angle,float near, float far)
+{
+	_projection->load_identity();
+	_projection->put(2,2, -(near+far)/near );
+	_projection->put(2,3,far);
+	_projection->put(3,2,-(1/near));
+	//
+	//
+	float r = tan( (M_PI/180)*angle )*near;
+	_canonical->load_identity();
+	_canonical->put(0,0,1/(r));
+	_canonical->put(1,1,1/(r));
+	_canonical->put(2,2,2/(near-far));
+	//
+	_canonical->put(2,3, -(near+far)/(near-far) );
+
+} 
+
 void getWindowCoord(Vector *v, int *x, int *y)
 {
 	Vector c = *v;
@@ -89,14 +105,17 @@ void getWindowCoord(Vector *v, int *x, int *y)
 	c = (*_model)*c;
 	/* --- world space to camera space -- */
 	c = (*_view)*c;
-	/* ---  projection to canonical space --- */
+	/* ---  camera to projection space --- */
 	c = (*_projection)*c;
-	// normalize
+	//
+	/* --- projection to caninical space  --- */
+	// homogeneous
 	c.put(0,c.get(0)/c.get(3));
 	c.put(1,c.get(1)/c.get(3));
 	c.put(2,c.get(2)/c.get(3));
-	c.put(3,1.0);	
-	
+	c.put(3,1.0);
+	//
+	c = (*_canonical)*c;
 	/* --- canonical to window space --- */
 	c = (*_window)*c;
 	*x = round(c.get(0));
@@ -122,6 +141,14 @@ void invertPoint(int &xi, int &yi, int &xf, int &yf)
 class tCor
 {
 public:
+	tCor(unsigned char r=0,unsigned char g=0, unsigned char b=0, unsigned char a=255)
+	{
+		this->r = r;
+		this->g = g;
+		this->b = b;
+		this->a = a;
+	}
+	//
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
