@@ -9,13 +9,9 @@ float angle = 1.0;
 //-----------------------------------------------------------------------------
 void MyGlDraw(void)
 {
-	for(int i=0;i<IMAGE_WIDTH*IMAGE_HEIGHT;i++)
-	{
-		FBptr[i*4]   = 0;
-		FBptr[i*4+1] = 0;
-		FBptr[i*4+2] = 0;
-		FBptr[i*4+3] = 255;
-	}
+	tCor ccor(0,0,0);
+	mygl_clear_color(&ccor);	
+	//
 	initMatrices();
 	//	mygl_rotate(_model,180,0,0,1);
 	Vector *pos =  new Vector( 0.0, 0.0, 1.0),

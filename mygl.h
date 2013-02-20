@@ -168,6 +168,17 @@ public:
 	}
 };
 
+void mygl_clear_color(tCor *cor)
+{
+	for(int i=0;i<IMAGE_WIDTH*IMAGE_HEIGHT;i++)
+	{
+		FBptr[i*4]   = cor->r;
+		FBptr[i*4+1] = cor->g;
+		FBptr[i*4+2] = cor->b;
+		FBptr[i*4+3] = cor->a;
+	}
+}
+
 void PutPixel(tPixel *pixel)
 {
 	if(pixel->x>IMAGE_WIDTH || pixel->x<0 || pixel->y>IMAGE_HEIGHT || pixel->y<0)
