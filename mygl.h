@@ -28,22 +28,30 @@ void initMatrices()
 	mygl_scale(_window,1.0,-1.0,1.0);
 	//
 	//
+	if(_model)
+		delete _model;
 	_model = new Matrix();
 	_model->load_identity();
 	//
+	if(_view)
+		delete _view;
 	_view = new Matrix();
 	_view->load_identity();
 	//
+	if(_projection)
+		delete _projection;
 	_projection = new Matrix();
 	_projection->load_identity();
 	//
+	if(_canonical)
+		delete _canonical;
 	_canonical = new Matrix();
 	_canonical->load_identity();
 }
 
 void mygl_look_at(Vector *pos, Vector *dir, Vector *up)
 {
-	Vector temp = *dir;
+	Vector temp(dir->get(0) - pos->get(0), dir->get(1) - pos->get(1), dir->get(2) - pos->get(2) );
 	temp.normalize();
 	Vector zc = -(temp);
 	//
@@ -76,6 +84,7 @@ void mygl_look_at(Vector *pos, Vector *dir, Vector *up)
 	t.put(1,3,-pos->get(1));
 	t.put(2,3,-pos->get(2));
 	//
+	_view->load_identity();
 	*_view = (*_view)*bT;
 	*_view = (*_view)*t;
 }
@@ -108,11 +117,15 @@ void getWindowCoord(Vector *v, int *x, int *y)
 	/* ---  camera to projection space --- */
 	c = (*_projection)*c;
 	//
+	//
 	/* --- projection to caninical space  --- */
 	// homogeneous
-	c.put(0,c.get(0)/c.get(3));
-	c.put(1,c.get(1)/c.get(3));
-	c.put(2,c.get(2)/c.get(3));
+	if(c.get(3))
+	{
+		c.put(0,c.get(0)/c.get(3));
+		c.put(1,c.get(1)/c.get(3));
+		c.put(2,c.get(2)/c.get(3));
+	}
 	c.put(3,1.0);
 	//
 	c = (*_canonical)*c;
@@ -259,7 +272,8 @@ void DrawLine(Vector *v1, Vector *v2, tCor *cor)
 			}
 		}
 		d+=dy;
-	}	
+	}
+	delete pixel;
 }
 
 void DrawLineNoBresenham(Vector *v1, Vector *v2, tCor *cor)

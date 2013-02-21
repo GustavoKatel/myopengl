@@ -9,10 +9,11 @@ float angle = 1.0;
 //-----------------------------------------------------------------------------
 void MyGlDraw(void)
 {
+	_model->load_identity();
+	//
 	tCor ccor(0,0,0);
 	mygl_clear_color(&ccor);	
 	//
-	initMatrices();
 	//	mygl_rotate(_model,180,0,0,1);
 	Vector *pos =  new Vector( 0.0, 0.0, 1.0),
 	       *dir = new Vector( 0.0, 0.0,-1.0),
@@ -21,11 +22,7 @@ void MyGlDraw(void)
 			dir,
 			up);
 	mygl_perspective(55.0, 1.0, 50.0f);
-	mygl_rotate(_model, angle,0,1,0);
-	mygl_rotate(_model,-angle,1,0,0);
-	mygl_rotate(_model,angle/2,0,0,1);
-//	angle+=1.0;
-	//	mygl_rotate(_model, 45,1,0,0);
+	//
 	//*************************************************************************
 	// Chame aqui as funções do mygl.h
 	//*************************************************************************
@@ -45,6 +42,11 @@ void MyGlDraw(void)
 	Vector vz2(0.0f, 0.0f, 2.0f);
 	DrawLine(&vz1, &vz2, &cz);
 	//
+	//
+	mygl_rotate(_model, angle,0,1,0);
+	mygl_rotate(_model,-angle,1,0,0);
+	mygl_rotate(_model, angle/2,0,0,1);
+	angle+=1.0;
 	tCor cor(255,255,255);
 	for(int i=0;i<objData->faceCount;i++)
 	{
@@ -82,6 +84,8 @@ void MyGlDraw(void)
 //-----------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
+	initMatrices();
+	//
 	objData = new objLoader();			// cria o objeto que carrega o modelo
 	objData->load("monkey_head2.obj");	// a carga do modelo é indicada atraves do nome do arquivo. 
 	// Inicializações.
